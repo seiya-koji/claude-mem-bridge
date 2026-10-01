@@ -1,0 +1,26 @@
+[project]
+name = "claude-mem-bridge"
+version = "0.1.0"
+description = "Share claude-mem memory across Claude Code, Codex, GitHub Copilot CLI, and IBM Bob Shell"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "Seiya Kojima" }
+]
+requires-python = ">=3.10"
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/seiya-koji/claude-mem-bridge"
+
+[project.scripts]
+claude-mem-bridge = "claude_mem_bridge.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.7.20,<0.8"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
