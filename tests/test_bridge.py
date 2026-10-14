@@ -89,3 +89,18 @@ def test_plugin_root_picks_newest_live_version(home):
         (cache / version / "scripts/worker-service.cjs").write_text("")
     (cache / "14.0.0/.orphaned_at").write_text("")
     assert bridge.plugin_root() == cache / "13.28.0"
+
+
+@pytest.mark.parametrize("host", ["copilot", "bob"])
+def test_runs_launched_by_claude_code_are_ignored(host, home, monkeypatch):
+    calls = []
+    monkeypatch.setattr(bridge, "plugin_root", lambda: home)
+    monkeypatch.setattr(bridge, "run_hook", lambda *args: calls.append(args) or {})
+    monkeypatch.setenv("CLAUDECODE", "1")
+    for event in ("SessionStart", "UserPromptSubmit", "PostToolUse"):
+        assert bridge.handle(HOSTS[host], {"hook_event_name": event, "session_id": "s"}) is None
+    assert calls == []
+
+    monkeypatch.delenv("CLAUDECODE")
+    bridge.handle(HOSTS[host], {"hook_event_name": "UserPromptSubmit", "session_id": "s"})
+    assert len(calls) == 1

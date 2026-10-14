@@ -13,6 +13,9 @@ The bridge fills in the missing sources so every agent starts with the memory of
 Once the installed claude-mem supports CLAUDE_MEM_SESSION_START_INCLUDE_ALL_SOURCES and it is enabled,
 the official hooks inject every source themselves, so claude / codex return nothing and bob / copilot
 only request their own source.
+
+When Claude Code runs bob / copilot as a subprocess, for example to delegate a task, the run is part of the
+Claude Code session that claude-mem already records, so the bridge neither records it nor injects context.
 """
 import glob
 import json
@@ -184,8 +187,14 @@ def normalize_payload(payload: dict) -> dict:
     return payload
 
 
+def launched_by_claude_code() -> bool:
+    return os.environ.get("CLAUDECODE") == "1"
+
+
 def handle(host: Host, payload: dict) -> dict | None:
     """Process one hook event and return the JSON to print, if any."""
+    if not host.official_platform and launched_by_claude_code():
+        return None
     event = payload.get("hook_event_name", "")
     root = plugin_root()
     if not root:

@@ -19,6 +19,8 @@ The bridge closes both gaps:
 For Copilot and Bob, the bridge calls claude-mem's own hook handlers with the agent name as the platform, which records under that name through claude-mem's raw adapter.
 Summaries are posted to the worker API directly, because the raw adapter does not read the last assistant message.
 The bridge also registers claude-mem's MCP server (search, timeline, ...) for Copilot and Bob.
+When Claude Code itself runs Copilot or Bob, for example to delegate a task, the run is part of the Claude Code session, so the bridge neither records it nor injects context.
+It tells these runs apart by the `CLAUDECODE=1` variable that Claude Code sets for its commands.
 
 Newer claude-mem builds add `CLAUDE_MEM_SESSION_START_INCLUDE_ALL_SOURCES`.
 When the installed claude-mem supports it and it is set to `"true"` in `~/.claude-mem/settings.json`, the official hooks inject every source themselves, and the bridge stops adding sources to avoid duplicates.
